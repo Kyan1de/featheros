@@ -1,0 +1,6 @@
+
+[org 0x7c00]
+
+
+
+HELLO_STR: db "Hello, world!",  0x0A, 0x0d, 0x00
