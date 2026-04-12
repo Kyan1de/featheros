@@ -54,9 +54,7 @@ lgdt[GDT_DESCRIPTOR]
 mov eax, cr0
 or eax, 1
 mov cr0, eax ; yay 32 bit!
-[bits 32]
-jmp CODE_SEG:start_protected_mode
-[bits 16]
+jmp CODE_SEG:start_protected_mode + 0x7c00
 %include "src/basic_output.asm"
 
 HELLO_STR: db "Hello, world!",  0x0a, 0x0d, 0x00
