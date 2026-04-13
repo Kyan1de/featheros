@@ -55,7 +55,16 @@ lgdt [GDT_DESCRIPTOR]
 mov eax, cr0
 or eax, 1
 mov cr0, eax ; yay 32 bit!
+jmp 0x8:fill_segments
+
+[bits 32]
+fill_segments:
+mov ax, 0x10
+mov ds, ax
+mov ss, ax
+mov esp, 0x090000
 jmp KERNEL_LOCATION
+
 %include "src/basic_output.asm"
 
 HELLO_STR: db "Hello, world!",  0x0a, 0x0d, 0x00

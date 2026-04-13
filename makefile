@@ -29,13 +29,12 @@ run: all
 	       	-drive file=./build/disk.img,index=0\
 	        -drive file=./runtime/test.img,index=1\
 		-D qemulog.txt\
-		-M accel=tcg,smm=off -d int -no-reboot -no-shutdown
-
+		-d int -no-reboot -no-shutdown 
 dbg: all
 	qemu-system-x86_64\
 	       	-drive file=./build/disk.img,index=0\
 	        -drive file=./runtime/test.img,index=1\
 		-D qemulog.txt\
-		-M accel=tcg,smm=off -d int -no-reboot -no-shutdown -s -S
+		-d int -no-reboot -no-shutdown -s -S -d int
 
 
