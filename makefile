@@ -13,7 +13,7 @@ kernel: kernel_entry.o kernel.o
 		./build/kernel_entry.o\
 		./build/kernel.o --oformat binary
 kernel_entry.o:
-	nasm ./src/kernel_entry.asm -f elf -o ./build/kernel_entry.o
+	nasm ./src/kernel_entry.asm -f elf32 -o ./build/kernel_entry.o
 kernel.o:
 	i386-linux-gcc -ffreestanding -fno-pie -m32 -g -c ./src/kernel.c -o ./build/kernel.o
 
