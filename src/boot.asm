@@ -2,59 +2,60 @@
 ; FeatherOS bootloader
 ;
 ; Order of operation:
-; 	- load kernel into memory
+; 	x load kernel into memory
 ;		- find kernel on disk
-;		- load kernel into established 32-bit address
-;	- switch into protected mode
-;	- jump to kernel
+;		x load kernel into established 32-bit address
+;	x switch into protected mode
+;	x jump to kernel
 ; 
 
+[org 0x7c00]
 [bits 16]
 
+KERNEL_LOCATION equ 0x1000
 
-mov ax, 0x7c0
-mov ds, ax
 mov [diskNum], dl
 mov si, HELLO_STR
 call print_str
 
+; load the kernel from after boot sector
 mov ah, 2 ; read
-mov al, 1 ; n sectors
+mov al, 5 ; n sectors
 mov ch, 0 ; cyl # 0
-mov cl, 1 ; sector #
+mov cl, 2 ; sector #
 mov dh, 0 ; head # 0
 mov dl, [diskNum] ; disk #
-inc dl
 ; es is the segment used
-mov bx, 0x7e0
+mov bx, 0x0
 mov es, bx
-xor bx, bx
+mov bx, KERNEL_LOCATION
 int 0x13 ; call interrupt to read from disk
 jc readerr
-cmp al, 1
+cmp al, 5
 jne readerr
-;otherwise, print the loaded data
-mov bx, 0x7e0
-mov ds, bx
-xor si, si
-call print_str
+
+;otherwise, set text mode and load as normal
+
+mov ah, 0x0
+mov al, 0x3
+int 10 ; text mode, higher res.
 jmp change_mode
 
 readerr:
-mov bx, 0x7c0
-mov ds, bx
 mov si, ERR_STR
 call print_str
 jmp $
 
 change_mode:
 cli
-lgdt[GDT_DESCRIPTOR]
+xor bx, bx
+mov ds, bx
+lgdt [GDT_DESCRIPTOR]
 ; change last bit of cr0 to 1
 mov eax, cr0
 or eax, 1
 mov cr0, eax ; yay 32 bit!
-jmp CODE_SEG:start_protected_mode + 0x7c00
+jmp KERNEL_LOCATION
 %include "src/basic_output.asm"
 
 HELLO_STR: db "Hello, world!",  0x0a, 0x0d, 0x00
@@ -63,15 +64,7 @@ ERR_STR: db "Error reading from disk!", 0xa, 0xd, 0x0
 
 %include "src/gdt.asm"
 
-[bits 32]
-start_protected_mode:
-; print to screen to test if we did it!
-mov al, 'A'
-mov ah, 0x0f ; white on black
-mov [0xb8000], ax ; move character and color bytes to vmem
-jmp $
-
 times 510 - ($-$$) db 0
 db 0x55, 0xaa
 
-
+; end of boot sector, kernel will be added here after load

@@ -9,9 +9,9 @@ code_descriptor:
 ; gran.(1), 32bs (1), 64bs (0), AVL? (0) => 1100 (other)
 dw 0xffff 	; first 16 of limit
 dw 0 		; first 24 of base
-dw 0
+db 0
 db 0b10011010 	; ppt + type flags 
-db 11001111 	; other flags + last four bits of limit
+db 0b11001111 	; other flags + last four bits of limit
 db 0 		; last 8 bits of base
 ; whoever designedd this structure is evil.
 data_descriptor:
@@ -21,9 +21,9 @@ data_descriptor:
 ; gran.(1), 32bs (1), 64bs (0), AVL? (0) => 1100 (other)
 dw 0xffff 	; first 16 of limit
 dw 0 		; first 24 of base
-dw 0
+db 0
 db 0b10010010 	; ppt + type flags 
-db 11001111 	; other flags + last four bits of limit
+db 0b11001111 	; other flags + last four bits of limit
 db 0 		; last 8 bits of base
 GDT_End:
 GDT_DESCRIPTOR:

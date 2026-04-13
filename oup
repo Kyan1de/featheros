@@ -1,0 +1,8 @@
+nasm -fbin ./src/boot.asm -o ./build/boot.bin
+qemu-img create -f qcow2 -b test.dat -F raw runtime/test.img 1M
+Formatting 'runtime/test.img', fmt=qcow2 cluster_size=65536 extended_l2=off compression_type=zlib size=1048576 backing_file=test.dat backing_fmt=raw lazy_refcounts=off refcount_bits=16
+nasm ./src/kernel_entry.asm -f elf -o ./build/kernel_entry.o
+gcc -ffreestanding -fno-pie -m32 -g -c ./src/kernel.c -o ./build/kernel.o
+ld -o ./build/kernel.bin\
+	-Ttext 0x1000 ./build/kernel_entry.o\
+	./build/kernel.o --oformat binary
