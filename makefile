@@ -9,13 +9,13 @@ bootloader.bin: .force-rebuild
 	nasm -fbin ./src/boot.asm -o ./build/boot.bin
 
 kernel: kernel_entry.o kernel.o
-	i386-linux-ld -T link.lds -o ./build/kernel.bin\
+	x86_64-linux-ld -T link.lds -o ./build/kernel.bin\
 		./build/kernel_entry.o\
 		./build/kernel.o --oformat binary
 kernel_entry.o:
-	nasm ./src/kernel_entry.asm -f elf32 -o ./build/kernel_entry.o
+	nasm ./src/kernel_entry.asm -f elf64 -o ./build/kernel_entry.o
 kernel.o:
-	i386-linux-gcc -ffreestanding -fno-pie -m32 -g -c ./src/kernel.c -o ./build/kernel.o
+	x86_64-linux-gcc -ffreestanding -fno-pie -m64 -g -c ./src/kernel.c -o ./build/kernel.o
 
 clean: 
 	rm ./runtime/*.img
