@@ -1,3 +1,6 @@
-build/*
-runtime/*
+build/*.*
+runtime/*.*
 qemulog.txt
+
+# dependancies
+limine/*
