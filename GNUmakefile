@@ -32,7 +32,8 @@ endif
 
 # User controllable C flags.
 CFLAGS := -g -O2 -pipe\
-	  -I ./limine
+	  -I ./limine\
+	  -I ./include
 
 # User controllable C preprocessor flags. We set none by default.
 CPPFLAGS :=

@@ -4,12 +4,6 @@ dd if=/dev/zero bs=1M count=0 seek=64 of=image.hdd
 # Create a partition table.
 PATH=$PATH:/usr/sbin:/sbin sgdisk image.hdd -n 1:2048 -t 1:ef00 -m 1
 
-# Download the latest Limine binary release for the 11.x branch.
-git clone https://github.com/Limine-Bootloader/Limine.git limine --branch=v11.x-binary --depth=1
-
-# Build "limine" utility.
-make -C limine
-
 # Install the Limine BIOS stages onto the image.
 ./limine/limine bios-install image.hdd
 
