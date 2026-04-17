@@ -60,24 +60,8 @@ int memcmp(const void *s1, const void *s2, size_t n) {
 	return 0;
 }
 
-// configuration for kernel level malloc
-#define blocksize 512
-
-#define ram_region_protected 1 // for kernel use
-
-typedef struct {
-	size_t base;
-	size_t limit;
-	uint16_t flags; // usage, owner, etc.
-} region_bounds;
-
-static region_bounds* bounds;
-
-void kmalloc_init(struct limine_memmap_response* mmap) {
-	return;
+uint32_t cpuid() {
+	uint32_t id, _unused1, _unused2;
+	asm volatile ( "rdtscp\n" : "=a" (_unused1), "=d" (_unused2), "=c" (id) : : );
+	return id;
 }
-
-void* kmalloc(size_t n) {
-	return NULL;
-}
-
