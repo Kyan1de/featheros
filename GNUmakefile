@@ -7,7 +7,7 @@ override OUTPUT := featheros
 
 # User controllable toolchain and toolchain prefix.
 TOOLCHAIN := x86_64-linux
-TOOLCHAIN_PREFIX := x86_64-linux-
+TOOLCHAIN_PREFIX := 
 ifneq ($(TOOLCHAIN),)
     ifeq ($(TOOLCHAIN_PREFIX),)
         TOOLCHAIN_PREFIX := $(TOOLCHAIN)-
@@ -31,7 +31,7 @@ ifeq ($(TOOLCHAIN),llvm)
 endif
 
 # User controllable C flags.
-CFLAGS := -g -O2 -pipe\
+CFLAGS := -ggdb -Og -pipe\
 	  -I ./limine\
 	  -I ./include
 
@@ -117,6 +117,8 @@ all: bin/$(OUTPUT)
 bin/$(OUTPUT): GNUmakefile linker.lds $(OBJ)
 	mkdir -p "$(dir $@)"
 	$(LD) $(LDFLAGS) $(OBJ) -o $@
+	objcopy --only-keep-debug bin/$(OUTPUT) obj/kernel.sym
+	strip --strip-debug bin/$(OUTPUT)
 
 # Compilation rules for *.c files.
 obj/%.c.o: %.c GNUmakefile

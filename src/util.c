@@ -60,8 +60,3 @@ int memcmp(const void *s1, const void *s2, size_t n) {
 	return 0;
 }
 
-uint32_t cpuid() {
-	uint32_t id, _unused1, _unused2;
-	asm volatile ( "rdtscp\n" : "=a" (_unused1), "=d" (_unused2), "=c" (id) : : );
-	return id;
-}
