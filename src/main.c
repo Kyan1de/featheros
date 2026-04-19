@@ -37,6 +37,8 @@ void kmain(void) {
 	// Fetch the first framebuffer.
 	struct limine_framebuffer *framebuffer = framebuffer_request.response->framebuffers[0];
 	kconsole_init(framebuffer);
+	
+	kprint("test");
 
 	// We're done, just hang...
 	for (;;) {}
