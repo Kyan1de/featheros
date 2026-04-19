@@ -14,4 +14,10 @@ int memcmp(const void *s1, const void *s2, size_t n);
 extern char kernel_start[]; 
 extern char kernel_end[];
 
+//typedefs to make C stop complaining
+typedef struct limine_framebuffer lfb;
+
+#define RANGEROUNDUP(a, b)  (((a)+(b)-1) & ~((b)-1))
+#define RANGEROUNDDOWN(a, b) (((a)) & ~((b)-1))
+
 #endif // k_util_h
