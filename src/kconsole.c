@@ -14,7 +14,7 @@ struct {
 } screendat;
 
 
-#define characterdat(ord) ((((ord)-32 < 0 || (ord)-32 > 16*8) ? 0 : (ord)-32 ) * CON_CHAR_HEIGHT)
+#define characterdat(ord) ((((ord)-32 < 0 || (ord)-32 > 16*8) ? 16*8 : (ord)-32 ) * CON_CHAR_HEIGHT)
 
 
 void kconsole_init(lfb *fb) {
@@ -45,6 +45,7 @@ void draw_console() {
 	for (int ii = 0; ii < CON_SIZE; ii++) {
 		char ch = buffer[(scr_start + ii) % CON_BUFSIZE];
 		if (ch == '\n') {draw_offset = RANGEROUNDDOWN(draw_offset+CON_WIDTH, CON_WIDTH); continue;} // minus 1 since ii increments on continue
+		if (ch == 0) continue;
 		draw_char((draw_offset%CON_WIDTH)*CON_CHAR_WIDTH, (draw_offset/CON_WIDTH)*CON_CHAR_HEIGHT, ch);
 		draw_offset++;
 	}
