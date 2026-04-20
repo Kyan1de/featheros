@@ -22,7 +22,7 @@ void kconsole_init(lfb *fb) {
 	screendat.ptr = fb->address;
 	screendat.width = fb->width;
 	screendat.height = fb->height;
-	kprint("Console initialized");
+	kprint("Console initialized\n");
 }
 
 void draw_char(uint64_t left, uint64_t top, char ch) {
@@ -32,6 +32,8 @@ void draw_char(uint64_t left, uint64_t top, char ch) {
 			int draw = chardat[charidx + y] & (0x80 >> x);
 			if (draw != 0)
 				screendat.ptr[(size_t)(y+top)*screendat.width + (size_t)(x+left)] = COL_WHITE;
+			else
+				screendat.ptr[(size_t)(y+top)*screendat.width + (size_t)(x+left)] = COL_BLACK;
 		}
 	}
 }
@@ -39,8 +41,12 @@ void draw_char(uint64_t left, uint64_t top, char ch) {
 void draw_console() {
 	scr_start = 0;//RANGEROUNDDOWN((uint64_t)buf_offset - CON_SIZE, CON_WIDTH); // align to a line
 	memset(screendat.ptr, 0, screendat.height*screendat.width*4); // *4 because 32 bit fb is assumed
+	uint64_t draw_offset = 0;
 	for (int ii = 0; ii < CON_SIZE; ii++) {
-		draw_char((ii%CON_WIDTH)*CON_CHAR_WIDTH, (ii/CON_WIDTH)*CON_CHAR_HEIGHT, buffer[(scr_start + ii) % CON_BUFSIZE]);
+		char ch = buffer[(scr_start + ii) % CON_BUFSIZE];
+		if (ch == '\n') {draw_offset = RANGEROUNDDOWN(draw_offset+CON_WIDTH, CON_WIDTH); continue;} // minus 1 since ii increments on continue
+		draw_char((draw_offset%CON_WIDTH)*CON_CHAR_WIDTH, (draw_offset/CON_WIDTH)*CON_CHAR_HEIGHT, ch);
+		draw_offset++;
 	}
 }
 

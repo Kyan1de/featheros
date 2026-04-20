@@ -10,12 +10,12 @@
 #define COL_BLACK 	0x00000000
 
 // screen defines
-#define CON_WIDTH 80
+#define CON_WIDTH 120
 #define CON_HEIGHT 48
-#define CON_SIZE CON_WIDTH*CON_HEIGHT
+#define CON_SIZE (CON_WIDTH*CON_HEIGHT)
 #define CON_CHAR_WIDTH 6
 #define CON_CHAR_HEIGHT 12
-#define CON_BUFSIZE CON_SIZE*2
+#define CON_BUFSIZE (CON_SIZE*2)
 
 void kconsole_init(lfb *fb);
 void kputc(char c);

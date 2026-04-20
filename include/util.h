@@ -5,6 +5,7 @@
 
 #ifndef k_util_h
 #define k_util_h
+
 void *memcpy(void *restrict dest, const void *restrict src, size_t n);
 void *memset(void *s, int c, size_t n);
 void *memmove(void *dest, const void *src, size_t n);
@@ -17,7 +18,7 @@ extern char kernel_end[];
 //typedefs to make C stop complaining
 typedef struct limine_framebuffer lfb;
 
-#define RANGEROUNDUP(a, b)  (((a)+(b)-1) & ~((b)-1))
-#define RANGEROUNDDOWN(a, b) (((a)) & ~((b)-1))
+#define RANGEROUNDUP(a, b)  ((a) - ((a)%(b)) + (b))
+#define RANGEROUNDDOWN(a, b) ((a) - ((a)%(b)))
 
 #endif // k_util_h
