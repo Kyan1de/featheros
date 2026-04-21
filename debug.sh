@@ -5,4 +5,5 @@ gdb	-ex "target remote localhost:1234"\
 	-ex "break kmain"\
 	-ex "c"\
 	-ex "layout split"\
+	-ex "set disassembly-flavor intel"\
 	-tui

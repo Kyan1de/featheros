@@ -27,26 +27,31 @@ void kconsole_init(lfb *fb) {
 
 void draw_char(uint64_t left, uint64_t top, char ch) {
 	size_t charidx = characterdat(ch);
+	uint64_t col_fg = ch << 24 | COL_WHITE;
+	uint64_t col_bg = ch << 24 | COL_BLACK;
 	for (int y = 0; y < CON_CHAR_HEIGHT; y++) {
 		for (int x = 0; x < CON_CHAR_WIDTH; x++) {
 			int draw = chardat[charidx + y] & (0x80 >> x);
 			if (draw != 0)
-				screendat.ptr[(size_t)(y+top)*screendat.width + (size_t)(x+left)] = COL_WHITE;
+				screendat.ptr[(size_t)(y+top)*screendat.width + (size_t)(x+left)] = col_fg;
 			else
-				screendat.ptr[(size_t)(y+top)*screendat.width + (size_t)(x+left)] = COL_BLACK;
+				screendat.ptr[(size_t)(y+top)*screendat.width + (size_t)(x+left)] = col_bg;
 		}
 	}
 }
 
 void draw_console() {
 	scr_start = 0;//RANGEROUNDDOWN((uint64_t)buf_offset - CON_SIZE, CON_WIDTH); // align to a line
-	memset(screendat.ptr, 0, screendat.height*screendat.width*4); // *4 because 32 bit fb is assumed
 	uint64_t draw_offset = 0;
 	for (int ii = 0; ii < CON_SIZE; ii++) {
 		char ch = buffer[(scr_start + ii) % CON_BUFSIZE];
 		if (ch == '\n') {draw_offset = RANGEROUNDDOWN(draw_offset+CON_WIDTH, CON_WIDTH); continue;} // minus 1 since ii increments on continue
 		if (ch == 0) continue;
-		draw_char((draw_offset%CON_WIDTH)*CON_CHAR_WIDTH, (draw_offset/CON_WIDTH)*CON_CHAR_HEIGHT, ch);
+		uint64_t left = (draw_offset%CON_WIDTH)*CON_CHAR_WIDTH;
+		uint64_t top = (draw_offset/CON_WIDTH)*CON_CHAR_HEIGHT;
+		if (screendat.ptr[(size_t)top*screendat.width + left] >> 24 == ch) continue;
+		draw_char(left, top, ' ');
+		draw_char(left, top, ch);
 		draw_offset++;
 	}
 }
@@ -62,3 +67,57 @@ void kprint(const char* s) {
 	draw_console();
 
 }
+
+void kputc(char c) {
+	buffer[buf_offset] = c;
+	buf_offset++;
+	buf_offset %= CON_BUFSIZE;
+	draw_console();
+}
+
+
+char intbuf[21] = {0}; // buffer for the integer printing functions
+
+#define uintprintfunc(append) \
+void kprint_u##append (uint##append##_t i) { \
+	size_t offset = 20; \
+	intbuf[offset] = '0'; \
+	if (i == 0) { \
+		offset--; \
+	} \
+	while (i) { \
+		intbuf[offset] = '0' + (uint8_t)(i % 10); \
+		i /= 10; \
+		offset--; \
+	} \
+	kprint(intbuf + offset + 1); \
+	memset(intbuf, 0, sizeof(intbuf)); \
+}
+
+#define intprintfunc(append) \
+void kprint_i##append (int##append##_t i) { \
+	size_t offset = 20; \
+	int negative = (i < 0); \
+	if (negative) i = -i; \
+	intbuf[offset] = '0'; \
+	if (i == 0) { \
+		offset--; \
+	} \
+	while (i) { \
+		intbuf[offset] = '0' + (uint8_t)(i % 10); \
+		i /= 10; \
+		offset--; \
+	} \
+	if (negative) {intbuf[offset] = '-'; offset--;} \
+	kprint(intbuf + offset + 1); \
+	memset(intbuf, 0, sizeof(intbuf)); \
+}
+
+uintprintfunc(64);
+uintprintfunc(32);
+uintprintfunc(16);
+uintprintfunc(8);
+intprintfunc(64);
+intprintfunc(32);
+intprintfunc(16);
+intprintfunc(8);
