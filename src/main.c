@@ -41,7 +41,7 @@ void kmain(void) {
 	kprint("\n");
 	kprint_u8(255);
 	kprint("\n");
-	kprint_i64(69420);
+	kprint_hex64(69420);
 	kprint("\n");
 	kprint_i64(-1);
 	kprint("\n");

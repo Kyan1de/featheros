@@ -32,3 +32,9 @@ void kprint_i64(int64_t i);
 void kprint_i32(int32_t i);
 void kprint_i16(int16_t i);
 void kprint_i8(int8_t i);
+
+// for hex data
+void kprint_hex8(uint8_t i);
+void kprint_hex16(uint16_t i);
+void kprint_hex32(uint32_t i);
+void kprint_hex64(uint64_t i);

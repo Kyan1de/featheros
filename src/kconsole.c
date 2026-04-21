@@ -49,7 +49,7 @@ void draw_console() {
 		if (ch == 0) continue;
 		uint64_t left = (draw_offset%CON_WIDTH)*CON_CHAR_WIDTH;
 		uint64_t top = (draw_offset/CON_WIDTH)*CON_CHAR_HEIGHT;
-		if (screendat.ptr[(size_t)top*screendat.width + left] >> 24 == ch) continue;
+		if (screendat.ptr[(size_t)top*screendat.width + left] >> 24 == ch) {draw_offset++; continue;}
 		draw_char(left, top, ' ');
 		draw_char(left, top, ch);
 		draw_offset++;
@@ -113,6 +113,23 @@ void kprint_i##append (int##append##_t i) { \
 	memset(intbuf, 0, sizeof(intbuf)); \
 }
 
+#define hexprintfunc(append) \
+void kprint_hex##append (uint##append##_t i) { \
+	const char hex[] = "0123456789ABCDEF"; \
+	size_t offset = 20; \
+	intbuf[offset] = '0'; \
+	if (i == 0) { \
+		offset--; \
+	} \
+	while (i) { \
+		intbuf[offset] = hex[i & 0x0F]; \
+		i = i >> 4; \
+		offset--; \
+	} \
+	kprint(intbuf + offset + 1); \
+	memset(intbuf, 0, sizeof(intbuf)); \
+}
+
 uintprintfunc(64);
 uintprintfunc(32);
 uintprintfunc(16);
@@ -121,3 +138,8 @@ intprintfunc(64);
 intprintfunc(32);
 intprintfunc(16);
 intprintfunc(8);
+hexprintfunc(64);
+hexprintfunc(32);
+hexprintfunc(16);
+hexprintfunc(8);
+
