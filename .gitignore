@@ -1,1 +1,7 @@
-build/*
+bin/*
+obj/*
+qemulog.txt
+*.hdd
+
+# dependancies
+limine/*
