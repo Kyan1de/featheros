@@ -4,4 +4,4 @@ qemulog.txt
 *.hdd
 
 # dependancies
-Limine/*
+Limine/
