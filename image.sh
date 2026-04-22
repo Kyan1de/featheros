@@ -5,7 +5,7 @@ dd if=/dev/zero bs=1M count=0 seek=64 of=image.hdd
 PATH=$PATH:/usr/sbin:/sbin sgdisk image.hdd -n 1:2048 -t 1:ef00 -m 1
 
 # Install the Limine BIOS stages onto the image.
-./limine/limine bios-install image.hdd
+./Limine/limine bios-install image.hdd
 
 # Format the image as fat32.
 mformat -i image.hdd@@1M
@@ -15,6 +15,6 @@ mmd -i image.hdd@@1M ::/EFI ::/EFI/BOOT ::/boot ::/boot/limine
 
 # Copy over the relevant files.
 mcopy -i image.hdd@@1M bin/featheros ::/boot
-mcopy -i image.hdd@@1M limine.conf limine/limine-bios.sys ::/boot/limine
-mcopy -i image.hdd@@1M limine/BOOTX64.EFI ::/EFI/BOOT
-mcopy -i image.hdd@@1M limine/BOOTIA32.EFI ::/EFI/BOOT
+mcopy -i image.hdd@@1M limine.conf Limine/limine-bios.sys ::/boot/limine
+mcopy -i image.hdd@@1M Limine/BOOTX64.EFI ::/EFI/BOOT
+mcopy -i image.hdd@@1M Limine/BOOTIA32.EFI ::/EFI/BOOT
