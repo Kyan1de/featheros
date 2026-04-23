@@ -2,11 +2,10 @@
 
 struct interrupt_frame
 {
-    uint16_t ip;
-    uint16_t cs;
-    uint16_t flags;
-    uint16_t sp;
-    uint16_t ss;
+    uint64_t rip;
+    uint64_t cs;
+    uint64_t rflags;
+    uint64_t rsp;
 };
 
 typedef struct _idt_entry {
@@ -17,24 +16,26 @@ typedef struct _idt_entry {
 	uint16_t offset_2;        // offset bits 16..31
 	uint32_t offset_3;        // offset bits 32..63
 	uint32_t zero;            // reserved
-} idt_entry
+} __attribute__((packed)) idt_entry_t;
 
 #define INT_GATE 0xE
 #define TRAP_GATE 0xF
 
-// NOTE: this is very temporary, will need to come back and refactor when implementing task switching and userspace
-#define MAKEIDTENTRY(interrupt, gate_t) \
-	struct _idt_entry { \
-		.offset_1 = &(interrupt) & 0xFFFF, \
+// NOTE: this is very temporary, will need to come back and refactor when implementing task switching and userspace and actual handlers. For now, we're just using exc_general_handler
+#define MAKEIDTENTRY(interrupt, gate_t, idx) \
+	struct _idt_entry e = { \
+		.offset_1 = (uint64_t)&(interrupt) & 0xFFFF, \
 		.selector = 0, \
 		.ist = 0, \
-		.type_attributes = 0b10000000 | (gate_t << 6), \
-		.offset_2 = (&(interrupt) >> 16) & 0xFFFF, \
-		.offset_3 = &(interrupt) >> 32, \
+		.type_attributes = (uint8_t)0b10000000 | (gate_t << 6), \
+		.offset_2 = ((uint64_t)&(interrupt) >> 16) & 0xFFFF, \
+		.offset_3 = (uint64_t)&(interrupt) >> 32, \
 		.zero = 0, \
-	}
+	}; \
+	IDT[idx] = e
 
 
-// __attribute__((interrupt)) void interrupt_handler(struct interrupt_frame* frame); is the general form of one of these interrupts
+// __attribute__((interrupt)) void interrupt_handler(struct interrupt_frame frame); is the general form of an interrupt handler
+// __attribute__((interrupt)) void exception_handler(uint64_t errcode, struct interrupt_frame frame); is the general form of an exception handler with an error code. If the exception does not provide a code, the first argument is omitted. 
 
 void idt_init(void);

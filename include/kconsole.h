@@ -6,7 +6,7 @@
 #define COL_GREEN 	0x0000FF00
 #define COL_BLUE 	0x000000FF
 #define COL_GRAY 	0x00AAAAAA
-#define COL_WHITE 	0xa0FFFFFF
+#define COL_WHITE 	0x00FFFFFF
 #define COL_BLACK 	0x00000000
 // for now we can use the upper byte of the colour to include some data 
 // to optimize the draw call for the console by storing the character drawn

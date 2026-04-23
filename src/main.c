@@ -8,6 +8,7 @@
 #include <kalloc.h>
 #include <kconsole.h>
 #include <limineconf.h>
+#include <idt.h>
 
 // Halt and catch fire function.
 static void hcf(void) {
@@ -37,6 +38,8 @@ void kmain(void) {
 	// Fetch the first framebuffer.
 	struct limine_framebuffer *framebuffer = framebuffer_request.response->framebuffers[0];
 	kconsole_init(framebuffer);
+	idt_init();
+
 	kprint_u64(69420);
 	kprint("\n");
 	kprint_u8(255);
@@ -49,7 +52,7 @@ void kmain(void) {
 	kprint("\n");
 	kprint_u64(0);
 	kprint("\n");
-	// We're done, just hang...
-	for (;;) {}
+	// We're done, hang by calling some interrupt
+	asm volatile ("int3");
 }
 
