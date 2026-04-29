@@ -1,41 +1,42 @@
 #include <stdint.h>
+#include <stdbool.h>
 
-struct interrupt_frame
-{
-    uint64_t rip;
-    uint64_t cs;
-    uint64_t rflags;
-    uint64_t rsp;
-};
+#ifndef IDT_H
+#define IDT_H
 
-typedef struct _idt_entry {
-	uint16_t offset_1;        // offset bits 0..15
-	uint16_t selector;        // a code segment selector in GDT or LDT
-	uint8_t  ist;             // bits 0..2 holds Interrupt Stack Table offset, rest of bits zero.
-	uint8_t  type_attributes; // gate type, dpl, and p fields
-	uint16_t offset_2;        // offset bits 16..31
-	uint32_t offset_3;        // offset bits 32..63
-	uint32_t zero;            // reserved
+#define IDT_MAX_DESCRIPTORS 256
+
+typedef struct {
+	uint16_t    isr_low;      // The lower 16 bits of the ISR's address
+	uint16_t    kernel_cs;    // The GDT segment selector that the CPU will load into CS before calling the ISR
+	uint8_t	    ist;          // The IST in the TSS that the CPU will load into RSP; set to zero for now
+	uint8_t     attributes;   // Type and attributes; see the IDT page
+	uint16_t    isr_mid;      // The higher 16 bits of the lower 32 bits of the ISR's address
+	uint32_t    isr_high;     // The higher 32 bits of the ISR's address
+	uint32_t    reserved;     // Set to zero
 } __attribute__((packed)) idt_entry_t;
 
-#define INT_GATE 0xE
-#define TRAP_GATE 0xF
+typedef struct {
+	uint16_t limit;
+	uint64_t base;
+} __attribute__((packed)) idtr_t;
 
-// NOTE: this is very temporary, will need to come back and refactor when implementing task switching and userspace and actual handlers. For now, we're just using exc_general_handler
-#define MAKEIDTENTRY(interrupt, gate_t, idx) \
-	struct _idt_entry e = { \
-		.offset_1 = (uint64_t)&(interrupt) & 0xFFFF, \
-		.selector = 0, \
-		.ist = 0, \
-		.type_attributes = (uint8_t)0b10000000 | (gate_t << 6), \
-		.offset_2 = ((uint64_t)&(interrupt) >> 16) & 0xFFFF, \
-		.offset_3 = (uint64_t)&(interrupt) >> 32, \
-		.zero = 0, \
-	}; \
-	IDT[idx] = e
-
-
-// __attribute__((interrupt)) void interrupt_handler(struct interrupt_frame frame); is the general form of an interrupt handler
-// __attribute__((interrupt)) void exception_handler(uint64_t errcode, struct interrupt_frame frame); is the general form of an exception handler with an error code. If the exception does not provide a code, the first argument is omitted. 
 
 void idt_init(void);
+__attribute__((noreturn)) void exception_handler(void);
+void idt_set_descriptor(uint8_t vector, void* isr, uint8_t flags);
+
+extern void* isr_stub_table[];
+static bool vectors[IDT_MAX_DESCRIPTORS];
+
+#define PIC1		0x20		/* IO base address for main PIC */
+#define PIC2		0xA0		/* IO base address for secondary PIC */
+#define PIC1_COMMAND	PIC1
+#define PIC1_DATA	(PIC1+1)
+#define PIC2_COMMAND	PIC2
+#define PIC2_DATA	(PIC2+1)
+
+#define PIC_EOI		0x20		/* End-of-interrupt command code */
+#define PIC_INIT	0x11		/* End-of-interrupt command code */
+
+#endif // IDT_H

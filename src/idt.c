@@ -1,38 +1,47 @@
 #include <idt.h>
 #include <kconsole.h>
 
-__attribute__((aligned(0x10)))
-static idt_entry_t IDT[256];
+__attribute__((aligned(0x10))) static idt_entry_t idt[IDT_MAX_DESCRIPTORS];
+static idtr_t idtr;
 
-typedef struct {
-	uint64_t offset;
-	uint16_t size;
-} __attribute__((packed)) idtr_t;
-
-static idtr_t idtr = {
-	.size = sizeof(IDT)/sizeof(idt_entry_t),
-	.offset = (uint64_t)&IDT,
-};
-
-__attribute__((noreturn))
-void exc_general_handler() {
+void exception_handler() {
+	kprint("test");
 	asm volatile ("cli; hlt"); // crash and burn
 }
 
-void idt_init(void) {
-	for (int ii = 0; ii < 32; ii++) {
-		MAKEIDTENTRY(exc_general_handler, INT_GATE, ii);
+void idt_set_descriptor(uint8_t vector, void* isr, uint8_t flags) {
+	idt_entry_t* descriptor = &idt[vector];
+
+	descriptor->isr_low	= (uint64_t)isr & 0xFFFF;
+	descriptor->kernel_cs	= 0;
+	descriptor->ist		= 0;
+	descriptor->attributes	= flags;
+	descriptor->isr_mid	= ((uint64_t)isr >> 16) & 0xFFFF;
+	descriptor->isr_high	= ((uint64_t)isr >> 32) & 0xFFFFFFFF;
+	descriptor->reserved	= 0;
+}
+
+
+
+void idt_init() {
+	idtr.base = (uintptr_t)&idt[0];
+	idtr.limit = (uint16_t)sizeof(idt_entry_t) * IDT_MAX_DESCRIPTORS - 1;
+
+	for (uint8_t vector = 0; vector < 32; vector++) {
+		idt_set_descriptor(vector, isr_stub_table[vector], 0x8E);
+		vectors[vector] = true;
 	}
-	asm volatile ("lidt %0" : : "m"(idtr) : ); 
-	asm volatile ("sti"); 
+
+	__asm__ volatile ("lidt %0" : : "m"(idtr)); // load the new IDT
+	__asm__ volatile ("sti"); // set the interrupt flag
 }
 
-/* we'll be making more refined handlers later, for now we just catch fire. 
-__attribute__((interrupt)) void zerodiv_handler(struct interrupt_frame frame) {
-	kprint("Division error at cs = ");
-	kprint_hex64(frame.cs);
-	kprint(" and rip = ");
-	kprint_hex64(frame.rip);
-}
-*/
 
+
+void PIC_sendEOI(uint8_t irq)
+{
+	if(irq >= 8)
+		outb(PIC2_COMMAND,PIC_EOI);
+
+	outb(PIC1_COMMAND,PIC_EOI);
+}
