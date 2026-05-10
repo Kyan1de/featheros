@@ -9,6 +9,7 @@
 #include <kconsole.h>
 #include <limineconf.h>
 #include <idt.h>
+#include <ACPI.h>
 
 // Halt and catch fire function.
 static void hcf(void) {
@@ -38,21 +39,9 @@ void kmain(void) {
 	// Fetch the first framebuffer.
 	struct limine_framebuffer *framebuffer = framebuffer_request.response->framebuffers[0];
 	kconsole_init(framebuffer);
-	idt_init();
+	ACPI_init();
 
-	kprint_u64(69420);
-	kprint("\n");
-	kprint_u8(255);
-	kprint("\n");
-	kprint_hex64(69420);
-	kprint("\n");
-	kprint_i64(-1);
-	kprint("\n");
-	kprint_i64(0);
-	kprint("\n");
-	kprint_u64(0);
-	kprint("\n");
-	// We're done, hang by calling some interrupt
-	asm volatile ("int3");
+	// we're done, hang
+	for (;;) {asm volatile ("hlt");}
 }
 

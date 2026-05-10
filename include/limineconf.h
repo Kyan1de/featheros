@@ -44,4 +44,11 @@ volatile struct limine_paging_mode_request paging_mode_request = {
     .revision = 0,
     .mode = LIMINE_PAGING_MODE_X86_64_5LVL,
 };
+
+__attribute__((used, section(".limine_requests")))
+volatile struct limine_rsdp_request rsdp_request = {
+    .id = LIMINE_RSDP_REQUEST_ID,
+    .revision = 0,
+};
+
 // will add the mp_request later when i am ready for that headache

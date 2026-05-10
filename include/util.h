@@ -12,8 +12,14 @@ void *memmove(void *dest, const void *src, size_t n);
 int memcmp(const void *s1, const void *s2, size_t n);
 
 // provided by linker, end index of kernel data
-extern char kernel_start[]; 
-extern char kernel_end[];
+// expected to be 64 bit
+extern char kernel_start[8]; 
+extern char kernel_end[8];
+
+#define VIRT_BITS 0xffff800000000000
+
+#define VIRT_TO_PHYS(addr) ((uint64_t)(addr)&~VIRT_BITS)
+#define PHYS_TO_VIRT(addr) ((uint64_t)(addr)|VIRT_BITS)
 
 //typedefs to make C stop complaining
 typedef struct limine_framebuffer lfb;

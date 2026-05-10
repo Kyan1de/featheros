@@ -46,6 +46,7 @@ void PIC_sendEOI(uint8_t irq)
 	outb(PIC1_COMMAND,PIC_EOI);
 }
 
+// TODO: this needs to be replaced by APIC at some point, for now i need to figure out everything leading up to that
 void PIC_remap(uint64_t offset1, uint64_t offset2) {
 	outb(PIC1_COMMAND, ICW1_INIT | ICW1_ICW4);
 	io_wait();

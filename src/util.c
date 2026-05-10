@@ -90,7 +90,7 @@ static inline uint16_t inw(uint16_t port) {
 	return ret;
 }
 
-static inline uint32_t inb(uint16_t port) {
+static inline uint32_t ind(uint16_t port) {
 	uint32_t ret;
 	asm volatile ( "ind %w1, %d0" 
 			: "=a"(ret)
