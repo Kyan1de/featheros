@@ -13,6 +13,7 @@ The main applications that i have in mind for this operating system are:
   - system recovery usb system things, a secondary operating system for inspecting another system for the purpose of debugging and repair
   - cyberdecks of many varieties
   - capable interface and monitor of the rat nest of arduino projects lurking somewhere in my walls
+
 and (if i do my job right) more!
 
 # that one core chroot feature (explaination)
