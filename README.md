@@ -1,4 +1,4 @@
-ok so making my own bootloader, while fun and interesting, is NOT the way to go for this project. so from now on, im just going to use a bootloader someone else wrote, specifically [Limine](https://github.com/Limine-Bootloader/Limine).
+ok so making my own bootloader, while fun and interesting, is NOT the way to go for this project. so from now on, im just going to use a bootloader someone else wrote, specifically [Limine](https://github.com/Limine-Bootloader/Limine). I may end up making a bootloader for this later on and have it chainload on systems with other bootloaders
 
 # goals
 
