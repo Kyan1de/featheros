@@ -27,6 +27,9 @@ typedef struct limine_framebuffer lfb;
 #define RANGEROUNDUP(a, b)  ((a) - ((a)%(b)) + (b))
 #define RANGEROUNDDOWN(a, b) ((a) - ((a)%(b)))
 
+// im sure this is std somewhere but idk
+#define stringify(x) #x
+#define xstringify(x) stringify(x)
 
 static inline void outb(uint16_t port, uint8_t val);
 static inline void outw(uint16_t port, uint16_t val);

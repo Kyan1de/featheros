@@ -68,6 +68,17 @@ void kprint(const char* s) {
 
 }
 
+void kprintn(char* s, int n) {
+	// read the string until we read a zero, copying to the buffer as we go
+	for (int i = 0; i < n; i++) {
+		buffer[buf_offset] = *s;
+		s++;
+		buf_offset++;
+		buf_offset %= CON_BUFSIZE;
+	}
+	draw_console();
+}
+
 void kputc(char c) {
 	buffer[buf_offset] = c;
 	buf_offset++;

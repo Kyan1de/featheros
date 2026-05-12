@@ -22,6 +22,7 @@
 void kconsole_init(lfb *fb);
 void kputc(char c);
 void kprint(const char* s);
+void kprintn(char* s, int n);
 
 // for integers
 void kprint_u64(uint64_t i);

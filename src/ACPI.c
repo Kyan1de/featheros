@@ -26,6 +26,40 @@ int ACPI_init() {
 	kprint_hex64((uint64_t)rsdt_p);
 	kprint("\n");
 	
+	for (int ii = 0; ii < (rsdt_p->header.length - sizeof(SDT_header_t))/4; ii++) { // iterate over all entries
+		SDT_header_t* p = (SDT_header_t*)PHYS_TO_VIRT(rsdt_p->entries[ii]);
+		kprintn(p->signature, 4);
+		kprint(" at ");
+		kprint_hex64((uint64_t)p);
+		kprint("\n");
+		// we only really care about the APIC/MADT, so:
+		if (memcmp(p->signature, "APIC", 4) == 0) {
+			MADT_t* apic = (MADT_t*)p;
+			if (checksum((uint8_t*)apic, apic->header.length) % 0x100 != 0) {
+				kprint("APIC failed checksum???\n");
+				return -1;
+			}
+			void* table_raw_p = (void*)apic;
+			uint32_t offset = sizeof(SDT_header_t) + 8; // offset into the start of the entries
+			// there's probably a better way to parse these, but this is just what jumps out to me.
+			// I call this trick "stumbling around in the dark"
+			while (offset < apic->header.length) {
+				MADT_entry_t* entry = (MADT_entry_t*)(table_raw_p + (size_t)offset);
+				switch (entry->entry_type) {
+					case MADT_lapic_type: kprint("MADT_lapic_type\n");break;
+					case MADT_io_apic_type: kprint("MADT_io_apic_type\n");break;
+					case MADT_io_apic_source_override_type: kprint("MADT_io_apic_source_override_type\n");break;
+					case MADT_io_apic_nmi_source_type: kprint("MADT_io_apic_nmi_source_type\n");break;
+					case MADT_lapic_nmi_type: kprint("MADT_lapic_nmi_type\n");break;
+					case MADT_lapic_address_override_type: kprint("MADT_lapic_address_override_type\n");break;
+					case MADT_lx2apic_type: kprint("MADT_lx2apic_type\n");break;
+					default: kprint("unknown MADT type???"); break;
+				}
+				offset += entry->record_length;
+			}
+		}
+	}
+
 	return 0;
 }
 
