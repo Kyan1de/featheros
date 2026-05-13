@@ -33,7 +33,8 @@ endif
 # User controllable C flags.
 CFLAGS := -ggdb -Og -pipe\
 	  -I ./limine\
-	  -I ./include
+	  -I ./include\
+	  -fcommon
 
 # User controllable C preprocessor flags. We set none by default.
 CPPFLAGS :=
